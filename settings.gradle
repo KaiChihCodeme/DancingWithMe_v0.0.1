@@ -1,1 +1,1 @@
-include ':RobotDevSample', ':RobotActivityLibrary', ':DancingWithMe', ':ZenboDialogSample', ':RobotSensorSample', ':ZenboGoToLocation'
+include ':RobotActivityLibrary', ':DancingWithMe', ':watchdancingsensor'

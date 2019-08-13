@@ -7,27 +7,43 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 
+import androidx.annotation.Nullable;
+
 import com.asus.robotframework.API.MotionControl;
 import com.asus.robotframework.API.RobotCallback;
 import com.asus.robotframework.API.RobotCmdState;
+import com.asus.robotframework.API.RobotCommand;
 import com.asus.robotframework.API.RobotErrorCode;
+import com.asus.robotframework.API.RobotFace;
 import com.asus.robotframework.API.VisionConfig;
 import com.asus.robotframework.API.results.DetectFaceResult;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.robot.asus.robotactivity.RobotActivity;
 
 import org.json.JSONObject;
 
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends RobotActivity {
     private static DetectPersonXYZ[] answer;
     private static ActionDetecter actionDetecter;
-    private static int times, isGetCount;
-    private static int d1, d2;
+    private static int times, isGetCount, watchOrientation;
+    private static int iCurrentCommandSerial;
     final Handler handler = new Handler();
     final Handler handler2 = new Handler();
     private Button stop_btn, start_btn;
     private static boolean isGetFace, isRunningChecker;
+
+
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private DocumentReference docRef = db.collection("dancing").document("watchState");
+    private DocumentReference docRefFollow = db.collection("dancing").document("follow");
+    Map<String, Object> FirebaseData;
 
     public static RobotCallback robotCallback = new RobotCallback() {
         @Override
@@ -38,6 +54,21 @@ public class MainActivity extends RobotActivity {
         @Override
         public void onStateChange(int cmd, int serial, RobotErrorCode err_code, RobotCmdState state) {
             super.onStateChange(cmd, serial, err_code, state);
+
+            if (serial == iCurrentCommandSerial && state == RobotCmdState.ACTIVE) {
+                stopDetectFace();
+                Log.d("onStageCheck","Active"+serial+"");
+            }
+            if (serial == iCurrentCommandSerial && state == RobotCmdState.SUCCEED) {
+                startDetectFace();
+                robotAPI.robot.setExpression(RobotFace.HIDEFACE);
+                Log.d("onStageCheck","Succeed"+serial+"");
+            }
+            if (serial == iCurrentCommandSerial && state == RobotCmdState.PENDING) {
+                startDetectFace();
+                robotAPI.robot.setExpression(RobotFace.HIDEFACE);
+                Log.d("onStageCheck","PENDING"+serial+"");
+            }
         }
 
         @Override
@@ -103,7 +134,7 @@ public class MainActivity extends RobotActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        robotAPI.motion.moveHead(0,60,MotionControl.SpeedLevel.Head.L2);
+        robotAPI.motion.moveHead(0, 70, MotionControl.SpeedLevel.Head.L2);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         times = 0;
@@ -125,6 +156,9 @@ public class MainActivity extends RobotActivity {
             }
         });
 
+        getFirebase();
+        getFirebaseFollow();
+
         //999跟0的還沒解決!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!有十萬分之一的機率會錯誤
         answer = new DetectPersonXYZ[1000000];
         //999跟0的還沒解決!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!有萬分之一的機率會錯誤
@@ -138,7 +172,7 @@ public class MainActivity extends RobotActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        robotAPI.robot.speak("Hello world. I am Zenbo. Nice to meet you.");
+        //robotAPI.robot.speak("Hello world. I am Zenbo. Nice to meet you.");
 
         startDetectFace();
         isGetFaceChecker();
@@ -162,7 +196,7 @@ public class MainActivity extends RobotActivity {
         robotAPI.vision.requestDetectFace(config);
     }
 
-    private void stopDetectFace() {
+    private static void stopDetectFace() {
         // stop detect person
         robotAPI.vision.cancelDetectFace();
 
@@ -187,6 +221,7 @@ public class MainActivity extends RobotActivity {
 
                         case 0:
                             robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.STOP);
+                            //robotAPI.utility.playAction(22);
                             Log.d("RobotMotion", "stop");
                             break;
 
@@ -216,6 +251,12 @@ public class MainActivity extends RobotActivity {
                             robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.BACKWARD);
                             robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.BACKWARD);
                             Log.d("RobotMotion", "BACKWARD");
+                            break;
+                        case 3:
+                            iCurrentCommandSerial = robotAPI.motion.moveBody(0f, 0.7f, 0f);
+                            break;
+                        case 4:
+                            iCurrentCommandSerial = robotAPI.motion.moveBody(0f, -0.7f, 0f);
                             break;
                     }
                 }
@@ -254,4 +295,83 @@ public class MainActivity extends RobotActivity {
             }
         });
     }
+
+    public void getFirebase() {
+
+
+        //firebase
+        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot snapshot,
+                                @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w("TAG", "Listen failed.", e);
+                    return;
+                }
+
+                String source = snapshot != null && snapshot.getMetadata().hasPendingWrites()
+                        ? "Local" : "Server";
+
+                if (snapshot != null && snapshot.exists()) {
+                    FirebaseData = snapshot.getData();
+                    watchOrientation = ((Number) FirebaseData.get("orientation")).intValue();
+
+                    switch (watchOrientation) {
+
+                        case 1:
+                            iCurrentCommandSerial = robotAPI.utility.playEmotionalAction(RobotFace.SERIOUS, 22);
+                            break;
+
+                    }
+
+                    Log.d("DataCheck", watchOrientation + "");
+
+                } else {
+                    Log.d("TAG", source + " data: null");
+                }
+            }
+        });
+        //firebase
+    }
+
+    public void getFirebaseFollow() {
+
+
+        //firebase
+        docRefFollow.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot snapshot,
+                                @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w("TAG", "Listen failed.", e);
+                    return;
+                }
+
+                String source = snapshot != null && snapshot.getMetadata().hasPendingWrites()
+                        ? "Local" : "Server";
+
+                if (snapshot != null && snapshot.exists()) {
+                    FirebaseData = snapshot.getData();
+                    Boolean isFollow = (Boolean) FirebaseData.get("isFollow");
+
+                    if (isFollow) {
+                        robotAPI.utility.followUser();
+                        stopDetectFace();
+                    } else {
+                       robotAPI.cancelCommand(RobotCommand.CANCEL);
+                        iCurrentCommandSerial = robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.STOP);
+                        robotAPI.motion.moveHead(0, 60, MotionControl.SpeedLevel.Head.L2);
+
+                    }
+
+
+                } else {
+                    Log.d("TAG", source + " data: null");
+                }
+            }
+        });
+        //firebase
+    }
+
 }
+

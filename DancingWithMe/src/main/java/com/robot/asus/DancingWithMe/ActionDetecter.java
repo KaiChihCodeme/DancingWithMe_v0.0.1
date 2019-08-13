@@ -36,6 +36,16 @@ public class ActionDetecter {
             return 2;
         }
 
+        if (y > 0.5) {
+            //zenbo往右
+            return 3;
+        }
+
+        if (y < -0.5) {
+            //往左
+            return 4;
+        }
+
         return 0;
     }
 }
