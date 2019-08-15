@@ -1,6 +1,7 @@
 package im.fju.watchdancingsensor;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -32,6 +33,8 @@ public class MainActivity extends WearableActivity {
     private Button show_button;
     private static final String TAG = "Watch MainActivity";
 
+
+
     //手錶辨識用
     private static TextView textShake, textOrientation;
     private int  direction = 0, lastDirection = 0;
@@ -58,6 +61,9 @@ public class MainActivity extends WearableActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+
+
 
         mTextView = (TextView) findViewById(R.id.text);
         show_button = (Button)findViewById(R.id.show_button);

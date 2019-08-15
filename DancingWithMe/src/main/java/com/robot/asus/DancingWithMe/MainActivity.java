@@ -1,5 +1,7 @@
 package com.robot.asus.DancingWithMe;
 
+import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -38,7 +40,10 @@ public class MainActivity extends RobotActivity {
     final Handler handler2 = new Handler();
     private Button stop_btn, start_btn;
     private static boolean isGetFace, isRunningChecker;
-
+    private MediaPlayer music_cha = new MediaPlayer();
+    final Handler handler_for_timer = new Handler();
+    private int count_for_timer;
+    private int songName;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private DocumentReference docRef = db.collection("dancing").document("watchState");
@@ -134,6 +139,10 @@ public class MainActivity extends RobotActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        Intent intent = getIntent();
+        songName = intent.getIntExtra("songName",R.raw.chachaaa);
+
         robotAPI.motion.moveHead(0, 70, MotionControl.SpeedLevel.Head.L2);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -176,6 +185,8 @@ public class MainActivity extends RobotActivity {
 
         startDetectFace();
         isGetFaceChecker();
+        music_cha = MediaPlayer.create(this,songName);
+        music_cha.start();
     }
 
     @Override
@@ -183,6 +194,7 @@ public class MainActivity extends RobotActivity {
         super.onPause();
 
         stopDetectFace();
+        music_cha.stop();
     }
 
     private static void startDetectFace() {
@@ -226,6 +238,7 @@ public class MainActivity extends RobotActivity {
                             break;
 
                         case 1:
+                            robotAPI.robot.setExpression(RobotFace.EXPECTING);
                             robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.FORWARD);
                             robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.FORWARD);
                             robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.FORWARD);
@@ -240,6 +253,7 @@ public class MainActivity extends RobotActivity {
                             Log.d("RobotMotion", "FORWARD");
                             break;
                         case 2:
+                            robotAPI.robot.setExpression(RobotFace.SHOCKED);
                             robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.BACKWARD);
                             robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.BACKWARD);
                             robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.BACKWARD);
@@ -253,9 +267,11 @@ public class MainActivity extends RobotActivity {
                             Log.d("RobotMotion", "BACKWARD");
                             break;
                         case 3:
+                            robotAPI.robot.setExpression(RobotFace.HAPPY);
                             iCurrentCommandSerial = robotAPI.motion.moveBody(0f, 0.7f, 0f);
                             break;
                         case 4:
+                            robotAPI.robot.setExpression(RobotFace.CONFIDENT);
                             iCurrentCommandSerial = robotAPI.motion.moveBody(0f, -0.7f, 0f);
                             break;
                     }
@@ -321,8 +337,40 @@ public class MainActivity extends RobotActivity {
                         case 1:
                             iCurrentCommandSerial = robotAPI.utility.playEmotionalAction(RobotFace.SERIOUS, 22);
                             break;
+                        case 4:
+                            //後傾
+                            robotAPI.utility.playEmotionalAction(RobotFace.HAPPY, 24);
+                            stopDetectFace();
+                            count_for_timer = -1;
 
-                    }
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Log.d("cccc", Integer.toString(count_for_timer));
+                                    //obotAPI.cancelCommandBySerial(iCurrentCommandSerial);
+                                    robotAPI.cancelCommandAll();
+                                    robotAPI.robot.setExpression(RobotFace.HIDEFACE);
+                                    startDetectFace();
+                                }
+                            }, 15000);
+
+                            /*
+                            handler_for_timer.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    count_for_timer += 1;
+                                    Log.d("cccc", Integer.toString(count_for_timer));
+                                    if (count_for_timer == 15) {
+                                        handler_for_timer.removeCallbacks(this);
+                                        robotAPI.cancelCommandBySerial(iCurrentCommandSerial);
+                                        robotAPI.robot.setExpression(RobotFace.HIDEFACE);
+                                        startDetectFace();
+                                    }
+                                    handler_for_timer.postDelayed(this, 1000);
+                                }
+                            });*/
+                            break;
+                  }
 
                     Log.d("DataCheck", watchOrientation + "");
 
