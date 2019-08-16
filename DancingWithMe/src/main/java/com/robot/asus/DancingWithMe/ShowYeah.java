@@ -135,8 +135,13 @@ public class ShowYeah extends RobotActivity {
             }
         });
 
+    }
 
+    @Override
+    protected void onResume() {
+            super.onResume();
 
+            robotAPI.robot.speak("Which style music do you like to dance with me?");
     }
 
 
