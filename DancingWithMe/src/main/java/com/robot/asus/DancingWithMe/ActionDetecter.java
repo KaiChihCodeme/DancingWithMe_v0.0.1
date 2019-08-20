@@ -26,12 +26,12 @@ public class ActionDetecter {
         y = s.getY();
         z = s.getZ();
 
-        if (x > 2) {
+        if (x > 1.3) {
             //zenbo往前
             return 1;
         }
 
-        if (x < 1.5) {
+        if (x < 1.1) {
             //zenbo往後
             return 2;
         }
