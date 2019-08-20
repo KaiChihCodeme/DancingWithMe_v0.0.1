@@ -53,6 +53,7 @@ public class MainActivity extends RobotActivity {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private DocumentReference docRef = db.collection("dancing").document("watchState");
     private DocumentReference docRefFollow = db.collection("dancing").document("follow");
+    private DocumentReference docRefHealth = db.collection("dancing").document("health");
     Map<String, Object> FirebaseData;
 
 
@@ -228,6 +229,8 @@ public class MainActivity extends RobotActivity {
         isGetFaceChecker();
         music_cha = MediaPlayer.create(this, songName);
         music_cha.start();
+
+        postStart();
     }
 
     @Override
@@ -241,7 +244,7 @@ public class MainActivity extends RobotActivity {
     private static void startDetectFace() {
         // start detect face
         VisionConfig.FaceDetectConfig config = new VisionConfig.FaceDetectConfig();
-        config.enableDebugPreview = true;  // set to true if you need preview screen
+        config.enableDebugPreview = false;  // set to true if you need preview screen
         config.intervalInMS = 100;
         config.enableDetectHead = true;
         config.enableFacePosture = true;
@@ -509,6 +512,9 @@ public class MainActivity extends RobotActivity {
 
                     robotAPI.robot.setExpression(RobotFace.HIDEFACE);
                     Log.d("scoreScore",score+"");
+                    postEnd();
+                    handler.removeCallbacksAndMessages(null);
+                    handler2.removeCallbacksAndMessages(null);
                     Intent intent = new Intent();
                     intent.putExtra("score", score);
                     intent.setClass(MainActivity.this, ResultActivity.class);
@@ -520,6 +526,14 @@ public class MainActivity extends RobotActivity {
                 handlerTime.postDelayed(this, 1000);
             }
         });
+    }
+
+    private void postStart() {
+        docRefHealth.update("isStarted", true);
+    }
+
+    private void postEnd() {
+        docRefHealth.update("isEnded", true);
     }
 
 }
