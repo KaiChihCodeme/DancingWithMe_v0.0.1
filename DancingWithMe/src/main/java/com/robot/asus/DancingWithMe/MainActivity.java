@@ -37,17 +37,18 @@ public class MainActivity extends RobotActivity {
     private static DetectPersonXYZ[] answer;
     private static ActionDetecter actionDetecter;
     private static int times, isGetCount, watchOrientation;
-    private static int iCurrentCommandSerial;
+    private static int iCurrentCommandSerial, iFirstSpeaking;
     final Handler handler = new Handler();
     final Handler handler2 = new Handler();
+    static final Handler handlerTime = new Handler();
     private Button stop_btn, start_btn;
     private static boolean isGetFace, isRunningChecker;
     private MediaPlayer music_cha = new MediaPlayer();
     final Handler handler_for_timer = new Handler();
     private int count_for_timer;
     private static boolean isMoving;
-    private static int temp;
-    private int songName, score;
+    private static int temp,TotalTime,score;
+    private int songName  ;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private DocumentReference docRef = db.collection("dancing").document("watchState");
@@ -68,7 +69,7 @@ public class MainActivity extends RobotActivity {
             if (serial == iCurrentCommandSerial && state == RobotCmdState.ACTIVE) {
                 stopDetectFace();
                 //robotAPI.robot.setExpression(RobotFace.HIDEFACE);
-                Log.d("onStageCheck","Active"+serial+"");
+                Log.d("onStageCheck", "Active" + serial + "");
                 Log.d("onStageCheck", "Active" + serial + "");
             }
             if (serial == iCurrentCommandSerial && state == RobotCmdState.SUCCEED) {
@@ -79,7 +80,7 @@ public class MainActivity extends RobotActivity {
                 } else {
                     isMoving = false;
                 }*/
-                Log.d("onStageCheck","Succeed"+serial+"");
+                Log.d("onStageCheck", "Succeed" + serial + "");
                 Log.d("onStageCheck", "Succeed" + serial + "");
             }
             if (serial == iCurrentCommandSerial && state == RobotCmdState.PENDING) {
@@ -156,12 +157,17 @@ public class MainActivity extends RobotActivity {
         Intent intent = getIntent();
         songName = intent.getIntExtra("songName", R.raw.chachaaa);
 
+
+        //計時器
+        totalTime();
+
         robotAPI.motion.moveHead(0, 40, MotionControl.SpeedLevel.Head.L2);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         times = 0;
-        temp=-1;
+        temp = -1;
         score = 0;
+        TotalTime = 0;
 
         stop_btn = (Button) findViewById(R.id.stop);
         stop_btn.setOnClickListener(new View.OnClickListener() {
@@ -198,8 +204,8 @@ public class MainActivity extends RobotActivity {
         super.onResume();
 
         robotAPI.robot.setExpression(RobotFace.PLEASED, "Hello, I am Zenbo. Nice to meet you.", new ExpressionConfig().speed(85));
-        robotAPI.robot.setExpression(RobotFace.ACTIVE,   "Let me tell you how to dance with me!" +
-        "You can move around and I will dance with you, as well as when you wear the watch and launch the watch sensor app, " +
+        iFirstSpeaking = robotAPI.robot.setExpression(RobotFace.ACTIVE, "Let me tell you how to dance with me!" +
+                "You can move around and I will dance with you, as well as when you wear the watch and launch the watch sensor app, " +
                 "You also can make different hand poses, and I will correspond to different dance steps.", new ExpressionConfig().speed(85));
         iCurrentCommandSerial = robotAPI.robot.setExpression(RobotFace.HAPPY, "Let's Dancing now! It's our show time!", new ExpressionConfig().speed(90));
 
@@ -253,7 +259,7 @@ public class MainActivity extends RobotActivity {
 
                         case 0:
                             robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.STOP);
-                          //  robotAPI.robot.setExpression(RobotFace.SINGING);
+                            //  robotAPI.robot.setExpression(RobotFace.SINGING);
                             Log.d("RobotMotion", "stop");
                             break;
 
@@ -273,7 +279,7 @@ public class MainActivity extends RobotActivity {
                             robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.FORWARD);
                             robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.FORWARD);
 
-                            score+=2;
+                            score += 2;
 
                             Log.d("RobotMotion", "FORWARD");
                             break;
@@ -292,20 +298,20 @@ public class MainActivity extends RobotActivity {
                             robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.BACKWARD);
                             robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.BACKWARD);
                             robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.BACKWARD);
-                            score+=2;
+                            score += 2;
                             Log.d("RobotMotion", "BACKWARD");
                             break;
                         case 3:
                             //isMoving = true;
                             robotAPI.robot.setExpression(RobotFace.HAPPY);
                             iCurrentCommandSerial = robotAPI.motion.moveBody(0f, 0.7f, 0f);
-                            score+=4;
+                            score += 4;
                             break;
                         case 4:
                             //isMoving = true;
                             robotAPI.robot.setExpression(RobotFace.CONFIDENT);
                             iCurrentCommandSerial = robotAPI.motion.moveBody(0f, -0.7f, 0f);
-                            score+=4;
+                            score += 4;
                             break;
                     }
                 }
@@ -339,7 +345,7 @@ public class MainActivity extends RobotActivity {
                     robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.STOP);
                     robotAPI.robot.setExpression(RobotFace.SINGING);
                     Log.d("RobotMotion", "stop");
-                    temp=0;
+                    temp = 0;
                     isGetFace = false;
                 }
 
@@ -373,12 +379,13 @@ public class MainActivity extends RobotActivity {
 
                         case 1:
                             iCurrentCommandSerial = robotAPI.utility.playEmotionalAction(RobotFace.INTERESTED, 22);
+                            score += 10;
                             break;
                         case 2:
                             robotAPI.utility.playEmotionalAction(RobotFace.EXPECTING, 15);
                             stopDetectFace();
                             count_for_timer = -1;
-
+                            score += 10;
                             new Handler().postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
@@ -388,9 +395,10 @@ public class MainActivity extends RobotActivity {
                                     robotAPI.robot.setExpression(RobotFace.HIDEFACE);
                                     startDetectFace();
                                 }
-                            }, 10000);
+                            }, 7000);
                         case 4:
                             //後傾
+                            score += 10;
                             robotAPI.utility.playEmotionalAction(RobotFace.HAPPY, 27);
                             stopDetectFace();
                             count_for_timer = -1;
@@ -404,7 +412,7 @@ public class MainActivity extends RobotActivity {
                                     robotAPI.robot.setExpression(RobotFace.HIDEFACE);
                                     startDetectFace();
                                 }
-                            }, 10000);
+                            }, 7000);
 
                             /*
                             handler_for_timer.post(new Runnable() {
@@ -471,6 +479,32 @@ public class MainActivity extends RobotActivity {
             }
         });
         //firebase
+    }
+
+
+    public void totalTime() {
+
+        handlerTime.post(new Runnable() {
+            @Override
+            public void run() {
+
+                TotalTime++;
+
+                if(TotalTime==50){
+
+                    robotAPI.robot.setExpression(RobotFace.HIDEFACE);
+                    Log.d("scoreScore",score+"");
+                    Intent intent = new Intent();
+                    intent.putExtra("score", score);
+                    intent.setClass(MainActivity.this, ResultActivity.class);
+                    startActivity(intent);
+
+
+                }
+
+                handlerTime.postDelayed(this, 1000);
+            }
+        });
     }
 
 }
