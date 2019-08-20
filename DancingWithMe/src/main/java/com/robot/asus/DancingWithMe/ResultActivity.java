@@ -39,8 +39,6 @@ public class ResultActivity extends RobotActivity {
 
 
 
-
-
     }
     public ResultActivity() {
         super(robotCallback, robotListenCallback);

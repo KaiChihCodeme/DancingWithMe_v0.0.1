@@ -41,7 +41,7 @@ public class MainActivity extends RobotActivity {
     final Handler handler = new Handler();
     final Handler handler2 = new Handler();
     static final Handler handlerTime = new Handler();
-    private Button stop_btn, start_btn;
+    private Button stop_btn, start_btn,endButton;
     private static boolean isGetFace, isRunningChecker;
     private MediaPlayer music_cha = new MediaPlayer();
     final Handler handler_for_timer = new Handler();
@@ -183,6 +183,21 @@ public class MainActivity extends RobotActivity {
             public void onClick(View view) {
                 robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.STOP);
                 startDetectFace();
+            }
+        });
+        endButton = (Button)findViewById(R.id.endButton);
+        endButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                robotAPI.robot.setExpression(RobotFace.HIDEFACE);
+                Log.d("scoreScore",score+"");
+                Intent intent = new Intent();
+                intent.putExtra("score", score);
+                intent.setClass(MainActivity.this, ResultActivity.class);
+                startActivity(intent);
+
             }
         });
 

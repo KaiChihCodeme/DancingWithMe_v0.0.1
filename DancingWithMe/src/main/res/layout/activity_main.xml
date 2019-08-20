@@ -26,4 +26,14 @@
         android:layout_marginBottom="659dp"
         android:text="START DETECT" />
 
+    <Button
+        android:id="@+id/endButton"
+        android:layout_width="386dp"
+        android:layout_height="255dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="866dp"
+        android:layout_marginBottom="12dp"
+        android:text="End" />
+
 </RelativeLayout>
