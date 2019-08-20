@@ -16,28 +16,42 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.github.nisrulz.sensey.Sensey;
 import com.github.nisrulz.sensey.ShakeDetector;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
+import java.sql.Ref;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
-public class MainActivity extends WearableActivity {
+public class MainActivity extends WearableActivity implements SensorEventListener {
 
     private TextView mTextView;
     private Button show_button;
     private static final String TAG = "Watch MainActivity";
 
 
-
     //手錶辨識用
     private static TextView textShake, textOrientation;
-    private int  direction = 0, lastDirection = 0;
+    private int direction = 0, lastDirection = 0;
     private float SmallDirectionCheckThreshold = 3f, DirectionCheckThreshold = 6f;
     private Sensor mAccelerometer;
     private static boolean isFollow;
@@ -48,12 +62,29 @@ public class MainActivity extends WearableActivity {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private DocumentReference docRef = db.collection("dancing").document("watchState");
     private DocumentReference docRefFollow = db.collection("dancing").document("follow");
+    private DocumentReference docRefHealth = db.collection("dancing").document("health");
     private Map<String, Object> watchState = new HashMap<>();
+    private Map<String, Object> healthData = new HashMap<>();
     private final Handler handlerWatch = new Handler();
     //Firebase
 
     private static final int MY_PERMISSIONS_REQUEST_BODY_SENSORS = 100;
     SensorManager mSensorManager;
+
+    /*final Handler handler_start = new Handler();
+    final Handler handler_end = new Handler();*/
+    final Handler handler = new Handler();
+    Sensor mHeartRateSensor;
+
+    ArrayList<String> data_heart_rate = new ArrayList<>();
+    ArrayList<String> data_time_that = new ArrayList<>();
+
+    long time_start, time_stop;
+    double total_second = 0;
+    long time_now;
+
+    private static boolean isStarted, isEnded;
+    private static String Id;
 
 
     @Override
@@ -62,19 +93,16 @@ public class MainActivity extends WearableActivity {
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-
-
-
-        mTextView = (TextView) findViewById(R.id.text);
-        show_button = (Button)findViewById(R.id.show_button);
+        mTextView = (TextView) findViewById(R.id.heart_rate_bpm);
+        show_button = (Button) findViewById(R.id.show_button);
         show_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                if(isFollow) {
+                if (isFollow) {
                     isFollow = false;
                     docRefFollow.update("isFollow", isFollow);
-                }else {
+                } else {
                     isFollow = true;
                     docRefFollow.update("isFollow", isFollow);
                 }
@@ -108,7 +136,6 @@ public class MainActivity extends WearableActivity {
                 // result of the request.
             }
         }
-
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
         //手錶運動辨識-------------------------------------
@@ -125,6 +152,20 @@ public class MainActivity extends WearableActivity {
 
         // Enables Always-on
         setAmbientEnabled();
+
+
+        //在背景0.5秒抓一次是不是true
+        /*handler.post(new Runnable() {
+            @Override
+            public void run() {
+                handler.postDelayed(this, 500);
+                Log.d(TAG, "postDelayed");
+                getCheckStart();
+            }
+        });*/
+
+        //註冊心跳偵測器
+        mHeartRateSensor = Objects.requireNonNull(mSensorManager).getDefaultSensor(Sensor.TYPE_HEART_RATE);
     }
 
     @Override
@@ -141,8 +182,30 @@ public class MainActivity extends WearableActivity {
         mSensorManager.registerListener(accelerometer, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         Sensey.getInstance().init(this);
 
+        /**抓是否開始dance**/
+        getCheckStart();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        //handler.removeCallbacksAndMessages(null);
+    }
+
+    //按出去後回來繼續handler
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        //在背景0.5秒抓一次是不是true
+        /*handler.post(new Runnable() {
+            @Override
+            public void run() {
+                handler.postDelayed(this, 500);
+                Log.d(TAG, "postDelayed");
+                getCheckStart();
+            }
+        });*/
+    }
 
 
     SensorEventListener accelerometer = new SensorEventListener() {
@@ -268,6 +331,197 @@ public class MainActivity extends WearableActivity {
         });
     }
 
+    private void startMeasure() {
+        data_heart_rate.clear();
+        data_time_that.clear();
+        mSensorManager.registerListener(this, mHeartRateSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        time_start = System.currentTimeMillis();
+        //Log.d("Sensor Status:", " Sensor registered: " + (mSe ? "yes" : "no"));
+        Log.d(TAG, "start measure");
+        show_button.setText("量測中...");
+        //開始之後恢復在背景0.5秒抓一次是不是運動結束了(true)
+        //doPostEnd();
+        /*handler.post(new Runnable() {
+            @Override
+            public void run() {
+                handler.postDelayed(this, 500);
+                Log.d(TAG, "postDelayed");
+                doCheckEnd();
+            }
+        });*/
+    }
 
+
+    private void stopMeasure() {
+        time_stop = System.currentTimeMillis();
+        total_second = (double) (time_stop - time_start) / 1000.0;
+        mSensorManager.unregisterListener(this);
+        //把boolean改成false
+        //doPostEnd();
+        show_button.setText("量測完畢。");
+        Log.e("時間:", Arrays.toString(data_time_that.toArray()));
+        Log.e("心跳:", Arrays.toString(data_heart_rate.toArray()));
+        //watch_data.add(data_heart_rate);
+        //watch_data.add(data_time_that);
+        //Collections.sort(data_time_that);
+        /*if (data_heart_rate.size() != 0 || data_time_that.size() != 0) {
+            //計算卡路里
+            calculateCalories();
+            //上傳心跳那些資料上去資料庫
+            doInvokeAPI();
+        }*/
+
+        //上傳健康資料
+        uploadData();
+
+        //停止之後恢復在背景0.5秒抓一次是不是開始運動(true)
+        /*handler.post(new Runnable() {
+            @Override
+            public void run() {
+                handler.postDelayed(this, 500);
+                Log.d(TAG, "postDelayed");
+                getCheckStart();
+            }
+        });*/
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        time_now = System.currentTimeMillis();
+        double record_time = (double) (time_now - time_start) / 1000.0;
+        double heartrate = event.values[0];
+        DecimalFormat df = new DecimalFormat("##.00");
+        heartrate = Double.parseDouble(df.format(heartrate));
+        String mHeartRate = String.format(Locale.getDefault(), "%3.2f", heartrate);
+
+        mTextView.setText(mHeartRate);
+
+        record_time = Double.parseDouble(df.format(record_time));
+        String mrecord_time = String.format(Locale.getDefault(), "%3.2f", record_time);
+        data_heart_rate.add(mHeartRate);
+        data_time_that.add(mrecord_time);
+        Log.e(TAG, "HR: " + mHeartRate + "TIME:" + record_time);
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+        Log.d(TAG, "Accuracy: " + i);
+    }
+
+    private void getCheckStart() {
+        docRefHealth.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot snapshot,
+                                @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "Listen failed.", e);
+                    return;
+                }
+
+                String source = snapshot != null && snapshot.getMetadata().hasPendingWrites()
+                        ? "Local" : "Server";
+
+                if (snapshot != null && snapshot.exists()) {
+                    Log.d(TAG, source + " data: " + snapshot.getData());
+                    isStarted = Boolean.parseBoolean(snapshot.get("isStarted").toString());
+                    isEnded = Boolean.parseBoolean(snapshot.get("isEnded").toString());
+                    if (isStarted) {
+                        //代表開始dance
+                        startMeasure();
+                        postFalseStart();
+                    } else if (isEnded) {
+                        stopMeasure();
+                        postFalseEnd();
+                    }
+                } else {
+                    Log.d(TAG, source + " data: null");
+                }
+            }
+        });
+    }
+
+    //post false to isStarted in order to initial
+    private void postFalseStart() {
+        docRefHealth
+                .update("isStarted", false)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "isStared false successfully updated!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error updating false to isStarted", e);
+                    }
+                });
+    }
+
+    //post false to isEnded in order to initial
+    private void postFalseEnd() {
+        docRefHealth
+                .update("isEnded", false)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "isEnded false successfully updated!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error updating false to isEnded", e);
+                    }
+                });
+    }
+
+    private void uploadData() {
+        double total_HR = 0;
+        for (int j = 0; j < data_heart_rate.size(); j++) {
+            total_HR += Double.parseDouble(data_heart_rate.get(j));
+        }
+        double average_HR = total_HR / data_heart_rate.size();
+        DecimalFormat df_for_HR = new DecimalFormat("##.00000");
+        average_HR = Double.parseDouble(df_for_HR.format(average_HR));
+
+        String stop_time = String.valueOf(time_stop);
+        Id = stop_time.substring(0, 10);
+
+        healthData.put("HR", data_heart_rate);
+        healthData.put("average_HR", average_HR);
+        healthData.put("time_moment", data_time_that);
+        healthData.put("total_time", total_second);
+
+     db.collection("dancing").document("health").collection(Id).document(Id).set(healthData)
+             .addOnSuccessListener(new OnSuccessListener<Void>() {
+                 @Override
+                 public void onSuccess(Void aVoid) {
+                     Log.d(TAG, "DocumentSnapshot successfully written!");
+                     //上傳最新資料
+                     docRefHealth.update("id", Id);
+                     docRefHealth.update("isNew", true)
+                             .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                 @Override
+                                 public void onSuccess(Void aVoid) {
+                                     Log.d(TAG, "DocumentSnapshot successfully updated!");
+                                 }
+                             })
+                             .addOnFailureListener(new OnFailureListener() {
+                                 @Override
+                                 public void onFailure(@NonNull Exception e) {
+                                     Log.w(TAG, "Error updating document", e);
+                                 }
+                             });
+
+                 }
+             })
+             .addOnFailureListener(new OnFailureListener() {
+                 @Override
+                 public void onFailure(@NonNull Exception e) {
+                     Log.w(TAG, "Error writing document", e);
+                 }
+             });
+    }
 
 }
