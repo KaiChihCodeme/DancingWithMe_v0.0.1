@@ -43,12 +43,13 @@ public class MainActivity extends RobotActivity {
     private MediaPlayer music_cha = new MediaPlayer();
     final Handler handler_for_timer = new Handler();
     private int count_for_timer;
-    private int songName;
+    private int songName, score;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private DocumentReference docRef = db.collection("dancing").document("watchState");
     private DocumentReference docRefFollow = db.collection("dancing").document("follow");
     Map<String, Object> FirebaseData;
+
 
     public static RobotCallback robotCallback = new RobotCallback() {
         @Override
@@ -62,17 +63,17 @@ public class MainActivity extends RobotActivity {
 
             if (serial == iCurrentCommandSerial && state == RobotCmdState.ACTIVE) {
                 stopDetectFace();
-                Log.d("onStageCheck","Active"+serial+"");
+                Log.d("onStageCheck", "Active" + serial + "");
             }
             if (serial == iCurrentCommandSerial && state == RobotCmdState.SUCCEED) {
                 startDetectFace();
                 robotAPI.robot.setExpression(RobotFace.HIDEFACE);
-                Log.d("onStageCheck","Succeed"+serial+"");
+                Log.d("onStageCheck", "Succeed" + serial + "");
             }
             if (serial == iCurrentCommandSerial && state == RobotCmdState.PENDING) {
                 startDetectFace();
                 robotAPI.robot.setExpression(RobotFace.HIDEFACE);
-                Log.d("onStageCheck","PENDING"+serial+"");
+                Log.d("onStageCheck", "PENDING" + serial + "");
             }
         }
 
@@ -141,12 +142,13 @@ public class MainActivity extends RobotActivity {
 
 
         Intent intent = getIntent();
-        songName = intent.getIntExtra("songName",R.raw.chachaaa);
+        songName = intent.getIntExtra("songName", R.raw.chachaaa);
 
         robotAPI.motion.moveHead(0, 70, MotionControl.SpeedLevel.Head.L2);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         times = 0;
+        score = 0;
 
         stop_btn = (Button) findViewById(R.id.stop);
         stop_btn.setOnClickListener(new View.OnClickListener() {
@@ -185,7 +187,7 @@ public class MainActivity extends RobotActivity {
 
         startDetectFace();
         isGetFaceChecker();
-        music_cha = MediaPlayer.create(this,songName);
+        music_cha = MediaPlayer.create(this, songName);
         music_cha.start();
     }
 
@@ -250,6 +252,8 @@ public class MainActivity extends RobotActivity {
                             robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.FORWARD);
                             robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.FORWARD);
 
+                            score+=2;
+
                             Log.d("RobotMotion", "FORWARD");
                             break;
                         case 2:
@@ -264,15 +268,18 @@ public class MainActivity extends RobotActivity {
                             robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.BACKWARD);
                             robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.BACKWARD);
                             robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.BACKWARD);
+                            score+=2;
                             Log.d("RobotMotion", "BACKWARD");
                             break;
                         case 3:
                             robotAPI.robot.setExpression(RobotFace.HAPPY);
                             iCurrentCommandSerial = robotAPI.motion.moveBody(0f, 0.7f, 0f);
+                            score+=4;
                             break;
                         case 4:
                             robotAPI.robot.setExpression(RobotFace.CONFIDENT);
                             iCurrentCommandSerial = robotAPI.motion.moveBody(0f, -0.7f, 0f);
+                            score+=4;
                             break;
                     }
                 }
@@ -370,7 +377,7 @@ public class MainActivity extends RobotActivity {
                                 }
                             });*/
                             break;
-                  }
+                    }
 
                     Log.d("DataCheck", watchOrientation + "");
 
@@ -406,7 +413,7 @@ public class MainActivity extends RobotActivity {
                         robotAPI.utility.followUser();
                         stopDetectFace();
                     } else {
-                       robotAPI.cancelCommand(RobotCommand.CANCEL);
+                        robotAPI.cancelCommand(RobotCommand.CANCEL);
                         iCurrentCommandSerial = robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.STOP);
                         robotAPI.motion.moveHead(0, 60, MotionControl.SpeedLevel.Head.L2);
 
