@@ -481,51 +481,55 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         //避免完全沒偵測到心跳，如果沒偵測到就噴錯誤訊息到LOG，並且不做事
         try {
-            for (int j = 0; j < data_heart_rate.size(); j++) {
-                total_HR += Double.parseDouble(data_heart_rate.get(j));
+            if (data_heart_rate.size() != 0) {
+                for (int j = 0; j < data_heart_rate.size(); j++) {
+                    total_HR += Double.parseDouble(data_heart_rate.get(j));
+                }
+
+                double average_HR = total_HR / data_heart_rate.size();
+                DecimalFormat df_for_HR = new DecimalFormat("##.00000");
+                average_HR = Double.parseDouble(df_for_HR.format(average_HR));
+
+                String stop_time = String.valueOf(time_stop);
+                Id = stop_time.substring(0, 10);
+
+                healthData.put("HR", data_heart_rate);
+                healthData.put("average_HR", average_HR);
+                healthData.put("time_moment", data_time_that);
+                healthData.put("total_time", total_second);
+
+                db.collection("dancing").document("health").collection(Id).document(Id).set(healthData)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(TAG, "DocumentSnapshot successfully written!");
+                                //上傳最新資料
+                                docRefHealth.update("id", Id);
+                                docRefHealth.update("isNew", true)
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Log.d(TAG, "DocumentSnapshot successfully updated!");
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.w(TAG, "Error updating document", e);
+                                            }
+                                        });
+
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w(TAG, "Error writing document", e);
+                            }
+                        });
+            } else {
+                Log.d(TAG, "沒心跳不做事");
             }
-
-            double average_HR = total_HR / data_heart_rate.size();
-            DecimalFormat df_for_HR = new DecimalFormat("##.00000");
-            average_HR = Double.parseDouble(df_for_HR.format(average_HR));
-
-            String stop_time = String.valueOf(time_stop);
-            Id = stop_time.substring(0, 10);
-
-            healthData.put("HR", data_heart_rate);
-            healthData.put("average_HR", average_HR);
-            healthData.put("time_moment", data_time_that);
-            healthData.put("total_time", total_second);
-
-            db.collection("dancing").document("health").collection(Id).document(Id).set(healthData)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d(TAG, "DocumentSnapshot successfully written!");
-                            //上傳最新資料
-                            docRefHealth.update("id", Id);
-                            docRefHealth.update("isNew", true)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            Log.d(TAG, "DocumentSnapshot successfully updated!");
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.w(TAG, "Error updating document", e);
-                                        }
-                                    });
-
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.w(TAG, "Error writing document", e);
-                        }
-                    });
         } catch (NumberFormatException ex) {
             Log.e(TAG, ex.toString());
         }
