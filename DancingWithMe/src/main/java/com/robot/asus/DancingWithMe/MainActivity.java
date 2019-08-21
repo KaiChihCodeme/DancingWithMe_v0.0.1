@@ -234,9 +234,26 @@ public class MainActivity extends RobotActivity {
     protected void onPause() {
         super.onPause();
 
+        handler.removeCallbacksAndMessages(null);
+        handlerTime.removeCallbacksAndMessages(null);
+        handler2.removeCallbacksAndMessages(null);
+        handler_for_timer.removeCallbacksAndMessages(null);
         stopDetectFace();
+        robotAPI.robot.stopSpeak();
         music_cha.stop();
+
+
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+
+
+
+    }
+
 
     private static void startDetectFace() {
         // start detect face
@@ -505,7 +522,7 @@ public class MainActivity extends RobotActivity {
 
                 TotalTime++;
 
-                if(TotalTime==50){
+                if(TotalTime==70){
 
                     robotAPI.robot.setExpression(RobotFace.HIDEFACE);
                     Log.d("scoreScore",score+"");

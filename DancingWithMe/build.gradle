@@ -38,4 +38,12 @@ dependencies {
     //Firebase
     implementation 'com.google.firebase:firebase-core:16.0.8'
     implementation 'com.google.firebase:firebase-firestore:18.2.0'
+
+    //運動心率效果
+    implementation 'com.race604.waveloading:library:1.1.1'
+
+    //ShimmerEffect
+    implementation 'io.supercharge:shimmerlayout:2.1.0'
+
+
 }
