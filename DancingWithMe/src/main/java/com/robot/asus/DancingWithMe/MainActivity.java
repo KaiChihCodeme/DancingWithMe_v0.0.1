@@ -26,6 +26,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.robot.asus.robotactivity.RobotActivity;
 
 import org.json.JSONObject;
@@ -49,6 +50,9 @@ public class MainActivity extends RobotActivity {
     private static boolean isMoving;
     private static int temp,TotalTime,score;
     private int songName  ;
+
+
+    private ListenerRegistration registration;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private DocumentReference docRef = db.collection("dancing").document("watchState");
@@ -158,6 +162,12 @@ public class MainActivity extends RobotActivity {
         Intent intent = getIntent();
         songName = intent.getIntExtra("songName", R.raw.chachaaa);
 
+        robotAPI.robot.setExpression(RobotFace.PLEASED, "Hello, I am Zenbo. Nice to meet you.", new ExpressionConfig().speed(85));
+        iFirstSpeaking = robotAPI.robot.setExpression(RobotFace.ACTIVE, "Let me tell you how to dance with me!" +
+                "You can move around and I will dance with you, as well as when you wear the watch and launch the watch sensor app, " +
+                "You also can make different hand poses, and I will correspond to different dance steps.", new ExpressionConfig().speed(85));
+        iCurrentCommandSerial = robotAPI.robot.setExpression(RobotFace.HAPPY, "Let's Dancing now! It's our show time!", new ExpressionConfig().speed(90));
+
 
         //計時器
         totalTime();
@@ -194,6 +204,7 @@ public class MainActivity extends RobotActivity {
 
                 robotAPI.robot.setExpression(RobotFace.HIDEFACE);
                 Log.d("scoreScore",score+"");
+                postEnd();
                 Intent intent = new Intent();
                 intent.putExtra("score", score);
                 intent.setClass(MainActivity.this, ResultActivity.class);
@@ -219,11 +230,6 @@ public class MainActivity extends RobotActivity {
     protected void onResume() {
         super.onResume();
 
-        robotAPI.robot.setExpression(RobotFace.PLEASED, "Hello, I am Zenbo. Nice to meet you.", new ExpressionConfig().speed(85));
-        iFirstSpeaking = robotAPI.robot.setExpression(RobotFace.ACTIVE, "Let me tell you how to dance with me!" +
-                "You can move around and I will dance with you, as well as when you wear the watch and launch the watch sensor app, " +
-                "You also can make different hand poses, and I will correspond to different dance steps.", new ExpressionConfig().speed(85));
-        iCurrentCommandSerial = robotAPI.robot.setExpression(RobotFace.HAPPY, "Let's Dancing now! It's our show time!", new ExpressionConfig().speed(90));
 
         startDetectFace();
         isGetFaceChecker();
@@ -237,9 +243,26 @@ public class MainActivity extends RobotActivity {
     protected void onPause() {
         super.onPause();
 
+        handler.removeCallbacksAndMessages(null);
+        handlerTime.removeCallbacksAndMessages(null);
+        handler2.removeCallbacksAndMessages(null);
+        handler_for_timer.removeCallbacksAndMessages(null);
+
         stopDetectFace();
+        robotAPI.robot.stopSpeak();
         music_cha.stop();
+
+
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+registration.remove();
+
+    }
+
 
     private static void startDetectFace() {
         // start detect face
@@ -464,7 +487,7 @@ public class MainActivity extends RobotActivity {
 
 
         //firebase
-        docRefFollow.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        registration = docRefFollow.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot snapshot,
                                 @Nullable FirebaseFirestoreException e) {
@@ -508,17 +531,21 @@ public class MainActivity extends RobotActivity {
 
                 TotalTime++;
 
-                if(TotalTime==50){
+                if(TotalTime==90){
 
                     robotAPI.robot.setExpression(RobotFace.HIDEFACE);
                     Log.d("scoreScore",score+"");
                     postEnd();
+
                     handler.removeCallbacksAndMessages(null);
                     handler2.removeCallbacksAndMessages(null);
                     Intent intent = new Intent();
                     intent.putExtra("score", score);
+                    registration.remove();
                     intent.setClass(MainActivity.this, ResultActivity.class);
                     startActivity(intent);
+
+
 
 
                 }

@@ -3,11 +3,15 @@ package com.robot.asus.DancingWithMe;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.TextView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.asus.robotframework.API.RobotCallback;
@@ -22,12 +26,15 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.race604.drawable.wave.WaveDrawable;
 import com.robot.asus.robotactivity.RobotActivity;
 
 import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;
+
+import io.supercharge.shimmerlayout.ShimmerLayout;
 
 public class ResultActivity extends RobotActivity {
 
@@ -42,6 +49,13 @@ public class ResultActivity extends RobotActivity {
     private String TAG = "ResultActivity";
     private static boolean isNew;
 
+    private static int iCurrentCommandSerial, iCurrentSpeakSerial;
+
+    private ImageView mImageView, gohome, imageMedal;
+    private WaveDrawable mWaveDrawable, mWaveDrawable2;
+
+    private TextView textTitle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,12 +66,83 @@ public class ResultActivity extends RobotActivity {
 
         tvAv_HR = findViewById(R.id.average_hr);
 
+        //取得分數
         Intent intent = getIntent();
         score = intent.getIntExtra("score", 0);
 
-        Log.d("scoreScore",score+"");
+        feedBack(score);
+        picWave(score);
+
+
+        gohome = findViewById(R.id.gohome);
+        gohome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                startActivity(new Intent(ResultActivity.this, ShowYeah.class));
+
+            }
+        });
+
+
+    }
+
+    public void picWave(int score) {
+        //圖片波動效果
+
+        mImageView = (ImageView) findViewById(R.id.imageHeart);
+        mWaveDrawable = new WaveDrawable(this, R.drawable.heart);
+        mImageView.setImageDrawable(mWaveDrawable);
+        mWaveDrawable.setLevel(5500);
+
+
+        imageMedal = (ImageView) findViewById(R.id.imageMedal);
+
+        ShimmerLayout shimmerText = (ShimmerLayout) findViewById(R.id.shimmer_text);
+
+
+        if (score < 10) {
+            imageMedal.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.lotus));
+
+
+        } else if (score < 25) {
+
+            imageMedal.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.lotus));
+
+
+        } else if (score <40) {
+
+            imageMedal.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.medal));
+            shimmerText.startShimmerAnimation();
+
+
+        } else {
+
+            imageMedal.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.award));
+            shimmerText.startShimmerAnimation();
+        }
+
+
+
+    }
+
+    public void feedBack(int score) {
 
         getAvHR();
+        if (score < 10) {
+            iCurrentCommandSerial = robotAPI.utility.playEmotionalAction(RobotFace.HAPPY, 25);
+            iCurrentSpeakSerial = robotAPI.robot.speak("you should try to dance happier move more steps and do more poses ");
+
+        } else if (score < 25) {
+            iCurrentSpeakSerial = robotAPI.robot.speak("You did a good job! but you can try more actions and poses to let zenbo dance");
+            iCurrentCommandSerial = robotAPI.utility.playEmotionalAction(RobotFace.HAPPY, 22);
+        } else if (score < 40) {
+            iCurrentSpeakSerial = robotAPI.robot.speak("You did a great job! try different poses as much as you can ");
+            iCurrentCommandSerial = robotAPI.utility.playEmotionalAction(RobotFace.HAPPY, 25);
+        } else {
+            iCurrentSpeakSerial = robotAPI.robot.speak("wonderful! You are a dancing genius!");
+            iCurrentCommandSerial = robotAPI.utility.playEmotionalAction(RobotFace.HAPPY, 20);
+        }
 
     }
 
@@ -87,8 +172,10 @@ public class ResultActivity extends RobotActivity {
                                     DocumentSnapshot document = task.getResult();
                                     if (document.exists()) {
                                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                                        Av_HR = document.get("average_HR").toString();
-                                        tvAv_HR.setText(Av_HR);
+
+                                        float HR = Math.round(((Number)document.get("average_HR")).intValue());
+                                        Av_HR = Float.toString(HR);
+                                        tvAv_HR.setText("Your Heart Rate : "+Av_HR);
                                         //將isNew歸零和id清空
                                         initIndex();
                                     } else {
@@ -125,6 +212,15 @@ public class ResultActivity extends RobotActivity {
         @Override
         public void onStateChange(int cmd, int serial, RobotErrorCode err_code, RobotCmdState state) {
             super.onStateChange(cmd, serial, err_code, state);
+
+            if (serial == iCurrentSpeakSerial && state != RobotCmdState.ACTIVE) {
+
+                Log.d("RobotDevSample", "command: " + iCurrentSpeakSerial + " SUCCEED");
+
+                robotAPI.robot.setExpression(RobotFace.HIDEFACE);
+                robotAPI.cancelCommandBySerial(iCurrentCommandSerial);
+
+            }
 
         }
 
