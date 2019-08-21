@@ -102,10 +102,12 @@ public class ResultActivity extends RobotActivity {
 
 
         if (score < 10) {
+            imageMedal.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.lotus));
 
 
         } else if (score < 25) {
 
+            imageMedal.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(),R.drawable.lotus));
 
 
         } else if (score <40) {
@@ -170,8 +172,10 @@ public class ResultActivity extends RobotActivity {
                                     DocumentSnapshot document = task.getResult();
                                     if (document.exists()) {
                                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                                        Av_HR = document.get("average_HR").toString();
-                                        tvAv_HR.setText(Av_HR);
+
+                                        float HR = Math.round(((Number)document.get("average_HR")).intValue());
+                                        Av_HR = Float.toString(HR);
+                                        tvAv_HR.setText("Your Heart Rate : "+Av_HR);
                                         //將isNew歸零和id清空
                                         initIndex();
                                     } else {
