@@ -41,15 +41,19 @@ public class MainActivity extends RobotActivity {
     private static int iCurrentCommandSerial, iFirstSpeaking;
     final Handler handler = new Handler();
     final Handler handler2 = new Handler();
+    final Handler handlerForTips = new Handler();
     static final Handler handlerTime = new Handler();
-    private Button stop_btn, start_btn,endButton;
+    private Button stop_btn, start_btn, endButton;
     private static boolean isGetFace, isRunningChecker;
     private MediaPlayer music_cha = new MediaPlayer();
     final Handler handler_for_timer = new Handler();
     private int count_for_timer;
     private static boolean isMoving;
-    private static int temp,TotalTime,score;
-    private int songName  ;
+    private static int temp, TotalTime, score;
+    private int songName;
+    private int draw_num;
+    int count_tips = 0;
+    SpeakScript speakScript;
 
 
     private ListenerRegistration registration;
@@ -165,7 +169,7 @@ public class MainActivity extends RobotActivity {
         robotAPI.robot.setExpression(RobotFace.PLEASED, "Hello, I am Zenbo. Nice to meet you.", new ExpressionConfig().speed(85));
         iFirstSpeaking = robotAPI.robot.setExpression(RobotFace.ACTIVE, "Let me tell you how to dance with me!" +
                 "You can move around and I will dance with you, as well as when you wear the watch and launch the watch sensor app, " +
-                "You also can make different hand poses, and I will correspond to different dance steps.", new ExpressionConfig().speed(85));
+                "You can also make different hand poses, and I will correspond to different dance steps.", new ExpressionConfig().speed(85));
         iCurrentCommandSerial = robotAPI.robot.setExpression(RobotFace.HAPPY, "Let's Dancing now! It's our show time!", new ExpressionConfig().speed(90));
 
 
@@ -196,14 +200,14 @@ public class MainActivity extends RobotActivity {
                 startDetectFace();
             }
         });
-        endButton = (Button)findViewById(R.id.endButton);
+        endButton = (Button) findViewById(R.id.endButton);
         endButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
 
                 robotAPI.robot.setExpression(RobotFace.HIDEFACE);
-                Log.d("scoreScore",score+"");
+                Log.d("scoreScore", score + "");
                 postEnd();
                 Intent intent = new Intent();
                 intent.putExtra("score", score);
@@ -219,7 +223,6 @@ public class MainActivity extends RobotActivity {
         //999跟0的還沒解決!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!有十萬分之一的機率會錯誤
         answer = new DetectPersonXYZ[1000000];
         //999跟0的還沒解決!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!有萬分之一的機率會錯誤
-
     }
 
     public MainActivity() {
@@ -259,7 +262,7 @@ public class MainActivity extends RobotActivity {
     protected void onStop() {
         super.onStop();
 
-registration.remove();
+        registration.remove();
 
     }
 
@@ -524,6 +527,7 @@ registration.remove();
 
 
     public void totalTime() {
+        draw_num = lotteryNum(25, 40);
 
         handlerTime.post(new Runnable() {
             @Override
@@ -531,10 +535,14 @@ registration.remove();
 
                 TotalTime++;
 
-                if(TotalTime==90){
+                if (TotalTime == draw_num) {
+                    tips();
+                }
+
+                if (TotalTime == 90) {
 
                     robotAPI.robot.setExpression(RobotFace.HIDEFACE);
-                    Log.d("scoreScore",score+"");
+                    Log.d("scoreScore", score + "");
                     postEnd();
 
                     handler.removeCallbacksAndMessages(null);
@@ -544,8 +552,6 @@ registration.remove();
                     registration.remove();
                     intent.setClass(MainActivity.this, ResultActivity.class);
                     startActivity(intent);
-
-
 
 
                 }
@@ -563,5 +569,38 @@ registration.remove();
         docRefHealth.update("isEnded", true);
     }
 
+    private int lotteryNum(int start, int end) {
+        return (int) (Math.random() * (end - start + 1) + start);
+    }
+
+    private void tips() {
+        speakScript = new SpeakScript();
+        robotAPI.robot.speak(speakScript.getStartSpeak());
+        Log.d("testYifan", speakScript.getResponse() + "\n" + speakScript.getWatchOrientation());
+
+        handlerForTips.post(new Runnable() {
+            @Override
+            public void run() {
+                count_tips++;
+                if (count_tips > 15) {
+                    Log.d("testYifan", 1 + "");
+                    if (!(TotalTime >= 80)) {
+                        count_tips = 0;
+                        draw_num = lotteryNum(TotalTime, TotalTime + 15);
+                    }
+                } else if (watchOrientation == speakScript.getWatchOrientation()) {
+                    robotAPI.robot.speak(speakScript.getResponse());
+                    if (!(TotalTime >= 80)) {
+                        count_tips = 0;
+                        Log.d("testYifan", "enter");
+                        draw_num = lotteryNum(TotalTime, TotalTime + 15);
+                    }
+                } else {
+                    Log.d("testYifan", "fuck");
+                    handlerForTips.postDelayed(this, 1000);
+                }
+            }
+        });
+    }
 }
 

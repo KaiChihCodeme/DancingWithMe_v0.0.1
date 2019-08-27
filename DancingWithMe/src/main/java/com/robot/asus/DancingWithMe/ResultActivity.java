@@ -80,6 +80,7 @@ public class ResultActivity extends RobotActivity {
             public void onClick(View view) {
 
                 startActivity(new Intent(ResultActivity.this, ShowYeah.class));
+                System.exit(0);
 
             }
         });
