@@ -132,16 +132,16 @@ public class ResultActivity extends RobotActivity {
         getAvHR();
         if (score < 10) {
             iCurrentCommandSerial = robotAPI.utility.playEmotionalAction(RobotFace.HAPPY, 25);
-            iCurrentSpeakSerial = robotAPI.robot.speak("you should try to dance happier move more steps and do more poses ");
+            iCurrentSpeakSerial = robotAPI.robot.speak(getResources().getString(R.string.RA_lessTen));
 
         } else if (score < 25) {
-            iCurrentSpeakSerial = robotAPI.robot.speak("You did a good job! but you can try more actions and poses to let zenbo dance");
+            iCurrentSpeakSerial = robotAPI.robot.speak(getResources().getString(R.string.RA_lessTwentyF));
             iCurrentCommandSerial = robotAPI.utility.playEmotionalAction(RobotFace.HAPPY, 22);
         } else if (score < 40) {
-            iCurrentSpeakSerial = robotAPI.robot.speak("You did a great job! try different poses as much as you can ");
+            iCurrentSpeakSerial = robotAPI.robot.speak(getResources().getString(R.string.RA_lessForty));
             iCurrentCommandSerial = robotAPI.utility.playEmotionalAction(RobotFace.HAPPY, 25);
         } else {
-            iCurrentSpeakSerial = robotAPI.robot.speak("wonderful! You are a dancing genius!");
+            iCurrentSpeakSerial = robotAPI.robot.speak(getResources().getString(R.string.RA_great));
             iCurrentCommandSerial = robotAPI.utility.playEmotionalAction(RobotFace.HAPPY, 20);
         }
 
@@ -176,7 +176,7 @@ public class ResultActivity extends RobotActivity {
 
                                         float HR = Math.round(((Number)document.get("average_HR")).intValue());
                                         Av_HR = Float.toString(HR);
-                                        tvAv_HR.setText("Your Heart Rate : "+Av_HR);
+                                        tvAv_HR.setText(getResources().getString(R.string.RA_HR) + Av_HR);
                                         //將isNew歸零和id清空
                                         initIndex();
                                     } else {

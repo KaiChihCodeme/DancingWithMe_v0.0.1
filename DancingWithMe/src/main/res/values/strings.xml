@@ -1,3 +1,29 @@
 <resources>
     <string name="app_name">DancingWithMe</string>
+
+    <!-- ShowYeah -->
+    <string name="MA_Hello">Hello, I am Zenbo. Nice to meet you.</string>
+    <string name="MA_intro">Let me tell you how to dance with me!  You can move around and I will dance with you,
+        as well as when you wear the watch and launch the watch sensor app,
+        You can also make different hand poses, and I will correspond to different dance steps.</string>
+    <string name="MA_which">Which style music do you like to dance with me?</string>
+
+    <!-- MA -->
+    <string name="MA_lets">Let\'s Dancing now! It\'s our show time!</string>
+
+    <!-- ResultActivity -->
+    <string name="RA_HR">Your Heart Rate : </string>
+    <string name="RA_lessTen">You should try to dance happier move more steps and do more poses.</string>
+    <string name="RA_lessTwentyF">You did a good job!  But you can try more actions and poses to let zenbo dance.</string>
+    <string name="RA_lessForty">You did a great job!  Try different poses as much as you can!</string>
+    <string name="RA_great">Wonderful! You are a dancing genius!</string>
+
+    <!-- SpeakScript -->
+    <string name="SS_handsup">Put your hands up!</string>
+    <string name="SS_open">Open your arms!</string>
+    <string name="SS_watch">Raise your hands in front of your face and watch your watch.</string>
+    <string name="SS_shake">Great! Shake your butt with me!</string>
+    <string name="SS_solo">Yeah! It\'s our SOLO time!</string>
+    <string name="SS_trun">Good job! Turn around with me!</string>
+
 </resources>

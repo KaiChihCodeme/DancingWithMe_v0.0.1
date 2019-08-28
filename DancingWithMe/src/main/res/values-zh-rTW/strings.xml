@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">DancingWithMe</string>
+
+    <!-- ShowYeah -->
+    <string name="MA_Hello">哈囉！我是Zenbo，很高興能認識你！</string>
+    <string name="MA_intro">讓我來告訴你要怎麼跟我一起跳舞吧！ 首先你可以前後左右移動，當你移動的時候我也會跟著你一起動起來，
+        你也可以戴著智慧手錶並且打開手錶偵測APP後，並做出不同的手部動作，我也會有不一樣的舞步唷!
+        </string>
+    <string name="MA_which">想要跟我跳哪一種類型的舞呢?</string>
+
+    <!-- MA -->
+    <string name="MA_lets">準備好了嗎？現在就來跟我一起跳舞吧！</string>
+
+    <!-- ResultActivity -->
+    <string name="RA_HR">平均心率 : </string>
+    <string name="RA_lessTen">你可以再多跳點不一樣的舞步和手勢唷，加油!</string>
+    <string name="RA_lessTwentyF">跳的很好唷!可以再跳得更活潑，並增加更多動作來讓我跳得更開心唷!</string>
+    <string name="RA_lessForty">你跳得很好!我也跳得很開心!試試看更多不同的舞步吧!</string>
+    <string name="RA_great">跳得太棒了吧!你根本就是跳舞天才阿!舞王就是你!</string>
+
+    <!-- SpeakScript -->
+    <string name="SS_handsup">舉高你的雙手!</string>
+    <string name="SS_open">張開你的雙手就像要擁抱我!</string>
+    <string name="SS_watch">將你的左手舉在你的面前，並且看著你的手錶!</string>
+    <string name="SS_shake">太棒了!跟我一起搖屁股!</string>
+    <string name="SS_solo">跳得好!一起開心跳舞吧!</string>
+    <string name="SS_trun">很棒!跟著我一起旋轉吧!</string>
+</resources>

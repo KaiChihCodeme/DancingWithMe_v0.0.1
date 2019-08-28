@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.asus.robotframework.API.ExpressionConfig;
 import com.asus.robotframework.API.RobotCallback;
 import com.asus.robotframework.API.RobotCmdState;
 import com.asus.robotframework.API.RobotErrorCode;
@@ -19,11 +20,13 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.util.List;
+import java.util.Locale;
 
 public class ShowYeah extends RobotActivity {
 
 
     private ImageView chachaImageView,popImageView,sambaImageView,backImageView;
+    private static int iCurrentCommandSerial;
 
     public static RobotCallback robotCallback = new RobotCallback() {
         @Override
@@ -34,6 +37,11 @@ public class ShowYeah extends RobotActivity {
         @Override
         public void onStateChange(int cmd, int serial, RobotErrorCode err_code, RobotCmdState state) {
             super.onStateChange(cmd, serial, err_code, state);
+
+            if (serial == iCurrentCommandSerial && state == RobotCmdState.SUCCEED) {
+                robotAPI.robot.setExpression(RobotFace.HIDEFACE);
+                Log.d("onStageCheck", "Succeed" + serial + "");
+            }
         }
 
         @Override
@@ -135,13 +143,21 @@ public class ShowYeah extends RobotActivity {
             }
         });
 
+        if (Locale.getDefault().getLanguage().equals("en")) {
+            robotAPI.robot.setExpression(RobotFace.PLEASED, getResources().getString(R.string.MA_Hello), new ExpressionConfig().speed(85));
+            iCurrentCommandSerial = robotAPI.robot.setExpression(RobotFace.ACTIVE, getResources().getString(R.string.MA_intro), new ExpressionConfig().speed(85));
+        } else {
+            robotAPI.robot.setExpression(RobotFace.PLEASED, getResources().getString(R.string.MA_Hello));
+            iCurrentCommandSerial = robotAPI.robot.setExpression(RobotFace.ACTIVE, getResources().getString(R.string.MA_intro));
+        }
+
     }
 
     @Override
     protected void onResume() {
             super.onResume();
 
-            robotAPI.robot.speak("Which style music do you like to dance with me?");
+        robotAPI.robot.speak(getResources().getString(R.string.MA_which));
     }
 
 

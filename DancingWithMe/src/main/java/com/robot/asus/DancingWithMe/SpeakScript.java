@@ -1,19 +1,42 @@
 package com.robot.asus.DancingWithMe;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.res.Resources;
+import android.os.Bundle;
+
+import java.util.Locale;
+
+import io.grpc.Contexts;
+
 public class SpeakScript {
+
     private String[] startSpeak ={
             "",
-            "Put your hands up",
-            "Open ur arms!",
+            "Put your hands up!",
+            "Open your arms!",
             "",
-            "Raise ur hands in front of your face and watch ur watch"
+            "Raise your hands in front of your face and watch your watch."
+    };
+    private String[] zh_startSpeak ={
+            "",
+            "舉高你的雙手!",
+            "張開你的雙手就像要擁抱我!",
+            "",
+            "將你的左手舉在你的面前，並且看著你的手錶!"
     };
     private String[] response  ={
             "",
-            "Shake your butt with me",
-            "It's SOLO time!",
+            "Great! Shake your butt with me!",
+            "Yeah! It's our SOLO time!",
             "",
-            "Turn around with me"};
+            "Good job! Turn around with me!"};
+    private String[] zh_response  ={
+            "",
+            "太棒了!跟我一起搖屁股!",
+            "跳得好!一起開心跳舞吧!",
+            "",
+            "很棒!跟著我一起旋轉吧!"};
     private int watchOrientation;
 
     public SpeakScript() {
@@ -29,11 +52,19 @@ public class SpeakScript {
     }
 
     public String getResponse() {
-        return response[watchOrientation];
+        if (Locale.getDefault().getLanguage().equals("en")) {
+            return response[watchOrientation];
+        } else {
+            return zh_response[watchOrientation];
+        }
     }
 
     public String getStartSpeak() {
-        return startSpeak[watchOrientation];
+        if (Locale.getDefault().getLanguage().equals("en")) {
+            return startSpeak[watchOrientation];
+        } else {
+            return zh_startSpeak[watchOrientation];
+        }
     }
 
 }

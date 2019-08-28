@@ -33,6 +33,8 @@ import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends RobotActivity {
     private static DetectPersonXYZ[] answer;
@@ -52,6 +54,7 @@ public class MainActivity extends RobotActivity {
     private static int temp, TotalTime, score;
     private int songName;
     private int draw_num;
+    private static float volume=1;
     int count_tips = 0;
     SpeakScript speakScript;
 
@@ -162,15 +165,10 @@ public class MainActivity extends RobotActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         Intent intent = getIntent();
         songName = intent.getIntExtra("songName", R.raw.chachaaa);
 
-        robotAPI.robot.setExpression(RobotFace.PLEASED, "Hello, I am Zenbo. Nice to meet you.", new ExpressionConfig().speed(85));
-        iFirstSpeaking = robotAPI.robot.setExpression(RobotFace.ACTIVE, "Let me tell you how to dance with me!" +
-                "You can move around and I will dance with you, as well as when you wear the watch and launch the watch sensor app, " +
-                "You can also make different hand poses, and I will correspond to different dance steps.", new ExpressionConfig().speed(85));
-        iCurrentCommandSerial = robotAPI.robot.setExpression(RobotFace.HAPPY, "Let's Dancing now! It's our show time!", new ExpressionConfig().speed(90));
+        iCurrentCommandSerial = robotAPI.robot.setExpression(RobotFace.HAPPY, getResources().getString(R.string.MA_lets), new ExpressionConfig().speed(90));
 
 
         //計時器
@@ -188,8 +186,11 @@ public class MainActivity extends RobotActivity {
         stop_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Log.d("testMusucFad","123");
+
                 robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.STOP);
                 stopDetectFace();
+
             }
         });
         start_btn = (Button) findViewById(R.id.start);
@@ -253,7 +254,7 @@ public class MainActivity extends RobotActivity {
 
         stopDetectFace();
         robotAPI.robot.stopSpeak();
-        music_cha.stop();
+       //music_cha.stop();
 
 
     }
@@ -328,7 +329,7 @@ public class MainActivity extends RobotActivity {
                             Log.d("RobotMotion", "FORWARD");
                             break;
                         case 2:
-                            robotAPI.robot.setExpression(RobotFace.SHOCKED);
+                            robotAPI.robot.setExpression(RobotFace.SINGING);
                             robotAPI.motion.moveHead(0, 45
                                     , MotionControl.SpeedLevel.Head.L2);
                             robotAPI.motion.remoteControlBody(MotionControl.Direction.Body.STOP);
@@ -537,10 +538,11 @@ public class MainActivity extends RobotActivity {
 
                 if (TotalTime == draw_num) {
                     tips();
+
                 }
 
                 if (TotalTime == 90) {
-
+                    startFadeOut();
                     robotAPI.robot.setExpression(RobotFace.HIDEFACE);
                     Log.d("scoreScore", score + "");
                     postEnd();
@@ -589,7 +591,7 @@ public class MainActivity extends RobotActivity {
                         draw_num = lotteryNum(TotalTime, TotalTime + 15);
                     }
                 } else if (watchOrientation == speakScript.getWatchOrientation()) {
-                    robotAPI.robot.speak(speakScript.getResponse());
+                    robotAPI.robot.speak(speakScript.getResponse(), new SpeakConfig().volume(100));
                     if (!(TotalTime >= 80)) {
                         count_tips = 0;
                         Log.d("testYifan", "enter");
@@ -602,5 +604,62 @@ public class MainActivity extends RobotActivity {
             }
         });
     }
+
+
+    private void startFadeOut(){
+
+        // The duration of the fade
+        final int FADE_DURATION = 3000;
+
+        // The amount of time between volume changes. The smaller this is, the smoother the fade
+        final int FADE_INTERVAL = 250;
+
+        // Calculate the number of fade steps
+        int numberOfSteps = FADE_DURATION / FADE_INTERVAL;
+
+        // Calculate by how much the volume changes each step
+        final float deltaVolume = volume / numberOfSteps;
+
+        // Create a new Timer and Timer task to run the fading outside the main UI thread
+        final Timer timer = new Timer(true);
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+
+                //Do a fade step
+                fadeOutStep(deltaVolume);
+
+                //Cancel and Purge the Timer if the desired volume has been reached
+                if(volume <= 0){
+                    timer.cancel();
+                    timer.purge();
+                    stopPlayer();
+                }
+            }
+        };
+
+        timer.schedule(timerTask,FADE_INTERVAL,FADE_INTERVAL);
+    }
+
+
+    private void fadeOutStep(float deltaVolume){
+        music_cha.setVolume(volume, volume);
+        Log.d("testMusucFad",volume+""+deltaVolume);
+        volume -= deltaVolume;
+    }
+
+    // Release the player from memory
+    private void stopPlayer() {
+
+        if (music_cha != null) {
+
+            music_cha.release();
+           music_cha= null;
+        }
+    }
+
+
+
+
 }
 
