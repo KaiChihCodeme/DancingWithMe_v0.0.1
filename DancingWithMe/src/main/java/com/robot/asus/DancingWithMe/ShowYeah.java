@@ -137,8 +137,9 @@ public class ShowYeah extends RobotActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent();
-                intent.setComponent(new ComponentName("com.robot.asus.MainDancing", "com.robot.asus.MainDancing.StartActivity" ));
+                intent.setComponent(new ComponentName("com.robot.asus.MainDancing", "com.robot.asus.MainDancing.MainActivity" ));
                 startActivity(intent);
+                //android.os.Process.killProcess(android.os.Process.myPid());
                 System.exit(0);
             }
         });
