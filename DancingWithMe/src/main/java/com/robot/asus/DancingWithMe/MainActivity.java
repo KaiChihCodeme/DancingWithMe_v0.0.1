@@ -60,6 +60,7 @@ public class MainActivity extends RobotActivity {
 
 
     private ListenerRegistration registration;
+    private ListenerRegistration registration2;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private DocumentReference docRef = db.collection("dancing").document("watchState");
@@ -86,7 +87,7 @@ public class MainActivity extends RobotActivity {
             }
             if (serial == iCurrentCommandSerial && state == RobotCmdState.SUCCEED) {
                 startDetectFace();
-                robotAPI.robot.setExpression(RobotFace.WORRIED);
+                robotAPI.robot.setExpression(RobotFace.EXPECTING);
                 /*if (!isMoving) {
                     robotAPI.robot.setExpression(RobotFace.HIDEFACE);
                 } else {
@@ -264,6 +265,7 @@ public class MainActivity extends RobotActivity {
         super.onStop();
 
         registration.remove();
+        registration2.remove();
 
     }
 
@@ -404,7 +406,7 @@ public class MainActivity extends RobotActivity {
 
 
         //firebase
-        registration =  docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        registration2 =  docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot snapshot,
                                 @Nullable FirebaseFirestoreException e) {
@@ -437,7 +439,7 @@ public class MainActivity extends RobotActivity {
                                     Log.d("cccc", Integer.toString(count_for_timer));
                                     //obotAPI.cancelCommandBySerial(iCurrentCommandSerial);
                                     robotAPI.cancelCommandAll();
-                                    robotAPI.robot.setExpression(RobotFace.HIDEFACE);
+                                    robotAPI.robot.setExpression(RobotFace.PLEASED);
                                     startDetectFace();
                                 }
                             }, 7000);
@@ -454,7 +456,7 @@ public class MainActivity extends RobotActivity {
                                     Log.d("cccc", Integer.toString(count_for_timer));
                                     //obotAPI.cancelCommandBySerial(iCurrentCommandSerial);
                                     robotAPI.cancelCommandAll();
-                                    robotAPI.robot.setExpression(RobotFace.HIDEFACE);
+                                    robotAPI.robot.setExpression(RobotFace.SHY);
                                     startDetectFace();
                                 }
                             }, 7000);
@@ -552,6 +554,7 @@ public class MainActivity extends RobotActivity {
                     Intent intent = new Intent();
                     intent.putExtra("score", score);
                     registration.remove();
+                    registration2.remove();
                     intent.setClass(MainActivity.this, ResultActivity.class);
                     startActivity(intent);
 
