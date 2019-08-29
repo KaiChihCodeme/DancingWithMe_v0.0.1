@@ -27,8 +27,8 @@
     <string name="SS_trun">Good job! Turn around with me!</string>
 
     <!-- Layout -->
-    <string name="touch"> Touch your option :</string>
-    <string name="cha"> Cha Cha</string>
-    <string name="samba"> Samba</string>
-    <string name="pop"> Pop song</string>
+    <string name="touch"> &#160;Touch your option :</string>
+    <string name="cha"> &#160;Cha Cha</string>
+    <string name="samba"> &#160;Samba</string>
+    <string name="pop">&#160;Pop song</string>
 </resources>

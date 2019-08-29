@@ -28,8 +28,8 @@
     <string name="SS_trun">很棒!跟著我一起旋轉吧!</string>
 
     <!-- Layout -->
-    <string name="touch"> 請選擇音樂 :</string>
-    <string name="cha"> 恰恰</string>
-    <string name="samba"> 森巴</string>
-    <string name="pop"> 流行音樂</string>
+    <string name="touch"> &#160;請選擇音樂 :</string>
+    <string name="cha"> &#160;恰恰</string>
+    <string name="samba"> &#160;森巴</string>
+    <string name="pop"> &#160;流行音樂</string>
 </resources>

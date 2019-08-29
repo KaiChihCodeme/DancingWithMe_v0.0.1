@@ -591,21 +591,21 @@ public class MainActivity extends RobotActivity {
                     Log.d("testYifan", 1 + "");
                     if (!(TotalTime >= 80)) {
                         count_tips = 0;
-                        draw_num = lotteryNum(TotalTime + 5, TotalTime + 20);
+                        draw_num = lotteryNum(TotalTime + 5, TotalTime + 15);
                     }
                 } else if (watchOrientation == speakScript.getWatchOrientation()) {
                     robotAPI.robot.speak(speakScript.getResponse(), new SpeakConfig().volume(100));
                     if (!(TotalTime >= 80)) {
                         count_tips = 0;
                         Log.d("testYifan", "enter");
-                        draw_num = lotteryNum(TotalTime + 5, TotalTime + 20);
+                        draw_num = lotteryNum(TotalTime + 5, TotalTime + 15);
                     }
                 }  else if (watchOrientation == speakScript.getWatchOrientation() + 6) {
                     robotAPI.robot.speak(speakScript.getResponse(), new SpeakConfig().volume(100));
                     if (!(TotalTime >= 80)) {
                         count_tips = 0;
                         Log.d("testYifan", "enter");
-                        draw_num = lotteryNum(TotalTime + 5, TotalTime + 20);
+                        draw_num = lotteryNum(TotalTime + 5, TotalTime + 15);
                     }
                 }else {
                     Log.d("testYifan", "fuck");
