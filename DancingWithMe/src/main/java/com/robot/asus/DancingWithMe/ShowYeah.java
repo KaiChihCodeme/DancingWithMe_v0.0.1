@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import com.asus.robotframework.API.ExpressionConfig;
@@ -25,7 +26,8 @@ import java.util.Locale;
 public class ShowYeah extends RobotActivity {
 
 
-    private ImageView chachaImageView,popImageView,sambaImageView,backImageView;
+    private ImageView backImageView;
+    private Button chachaButton,popButton,sambaButton;
     private static int iCurrentCommandSerial;
 
     public static RobotCallback robotCallback = new RobotCallback() {
@@ -98,12 +100,12 @@ public class ShowYeah extends RobotActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_yeah);
 
-        chachaImageView = (ImageView)findViewById(R.id.chachaImageView);
-        popImageView = (ImageView)findViewById(R.id.popImageView);
-        sambaImageView = (ImageView)findViewById(R.id.sambaImageView);
-        backImageView = (ImageView)findViewById(R.id.backImageView);
+        chachaButton = (Button)findViewById(R.id.chacha);
+        popButton = (Button)findViewById(R.id.popsong);
+        sambaButton = (Button)findViewById(R.id.samba);
+        backImageView = (ImageView)findViewById(R.id.back);
 
-        chachaImageView.setOnClickListener(new View.OnClickListener() {
+        chachaButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -113,7 +115,7 @@ public class ShowYeah extends RobotActivity {
                 startActivity(intent);
             }
         });
-        popImageView.setOnClickListener(new View.OnClickListener() {
+        popButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent();
@@ -122,7 +124,7 @@ public class ShowYeah extends RobotActivity {
                 startActivity(intent);
             }
         });
-        sambaImageView.setOnClickListener(new View.OnClickListener() {
+        sambaButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent();

@@ -1,49 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ShowYeah">
-
-
-    <ImageView
-        android:id="@+id/chachaImageView"
-        android:layout_width="600dp"
-        android:layout_height="300dp"
-        android:layout_marginStart="88dp"
-        android:layout_marginBottom="8dp"
-        android:src="@drawable/cha"
-        app:layout_constraintBottom_toTopOf="@+id/imageView2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.343" />
+    android:background="#000000">
 
     <ImageView
-        android:id="@+id/sambaImageView"
-        android:layout_width="600dp"
-        android:layout_height="300dp"
-        android:layout_marginStart="292dp"
-        android:src="@drawable/samba"
-        app:layout_constraintBottom_toTopOf="@+id/popImageView"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:id="@+id/back"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_gravity="right"
+        android:layout_marginTop="50dp"
+        android:layout_marginRight="50dp"
+        android:src="@android:drawable/ic_menu_revert" />
 
-    <ImageView
-        android:id="@+id/popImageView"
-        android:layout_width="600dp"
-        android:layout_height="300dp"
-        android:layout_marginEnd="88dp"
-        android:src="@drawable/pop"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+    <LinearLayout
+        android:id="@+id/LinearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/backImageView"
-        android:layout_width="218dp"
-        android:layout_height="143dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:src="@android:drawable/ic_menu_revert"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:id="@+id/LinearLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="50dp"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:layout_width="991dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:gravity="left"
+                android:text="@string/touch"
+                android:textAllCaps="false"
+                android:textColor="#ffffff"
+                android:textSize="80sp" />
+
+            <Button
+                android:id="@+id/chacha"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:background="#2c3e50"
+                android:gravity="left"
+                android:text="@string/cha"
+                android:textAllCaps="false"
+                android:textColor="#ecf0f1"
+                android:textSize="120sp" />
+
+            <Button
+                android:id="@+id/samba"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:background="#2c3e50"
+                android:gravity="left"
+                android:text="@string/samba"
+                android:textAllCaps="false"
+                android:textColor="#ecf0f1"
+                android:textSize="120sp" />
+
+            <Button
+                android:id="@+id/popsong"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:background="#2c3e50"
+                android:gravity="left"
+                android:text="@string/pop"
+                android:textAllCaps="false"
+                android:textColor="#ecf0f1"
+                android:textSize="120sp" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

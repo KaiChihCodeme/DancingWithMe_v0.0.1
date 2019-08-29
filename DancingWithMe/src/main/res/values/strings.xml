@@ -26,4 +26,9 @@
     <string name="SS_solo">Yeah! It\'s our SOLO time!</string>
     <string name="SS_trun">Good job! Turn around with me!</string>
 
+    <!-- Layout -->
+    <string name="touch"> Touch your option :</string>
+    <string name="cha"> Cha Cha</string>
+    <string name="samba"> Samba</string>
+    <string name="pop"> Pop song</string>
 </resources>

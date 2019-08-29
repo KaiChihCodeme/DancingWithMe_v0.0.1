@@ -26,4 +26,10 @@
     <string name="SS_shake">太棒了!跟我一起搖屁股!</string>
     <string name="SS_solo">跳得好!一起開心跳舞吧!</string>
     <string name="SS_trun">很棒!跟著我一起旋轉吧!</string>
+
+    <!-- Layout -->
+    <string name="touch"> 請選擇音樂 :</string>
+    <string name="cha"> 恰恰</string>
+    <string name="samba"> 森巴</string>
+    <string name="pop"> 流行音樂</string>
 </resources>
