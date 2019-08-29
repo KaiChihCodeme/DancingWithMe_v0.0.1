@@ -16,14 +16,14 @@ public class SpeakScript {
             "Put your hands up!",
             "Open your arms!",
             "",
-            "Raise your hands in front of your face and watch your watch."
+            "Open your arms with palms upward!"
     };
     private String[] zh_startSpeak ={
             "",
             "舉高你的雙手!",
             "張開你的雙手就像要擁抱我!",
             "",
-            "將你的左手舉在你的面前，並且看著你的手錶!"
+            "張開你的雙手，並且手掌朝上!"
     };
     private String[] response  ={
             "",

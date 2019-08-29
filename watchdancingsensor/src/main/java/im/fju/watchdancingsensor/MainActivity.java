@@ -282,7 +282,11 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             textOrientation.setText("小後傾");
             direction = 0;
 
-        } else {
+        } else if (accDataList[2] < -6f){
+            textOrientation.setText("翻轉");
+            direction = 10;
+        }
+        else {
             textOrientation.setText("平");
             direction = 0;
         }

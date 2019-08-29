@@ -86,7 +86,7 @@ public class MainActivity extends RobotActivity {
             }
             if (serial == iCurrentCommandSerial && state == RobotCmdState.SUCCEED) {
                 startDetectFace();
-                robotAPI.robot.setExpression(RobotFace.HIDEFACE);
+                robotAPI.robot.setExpression(RobotFace.WORRIED);
                 /*if (!isMoving) {
                     robotAPI.robot.setExpression(RobotFace.HIDEFACE);
                 } else {
@@ -254,7 +254,7 @@ public class MainActivity extends RobotActivity {
 
         stopDetectFace();
         robotAPI.robot.stopSpeak();
-       //music_cha.stop();
+        music_cha.stop();
 
 
     }
@@ -367,7 +367,7 @@ public class MainActivity extends RobotActivity {
     }
 
     private void isGetFaceChecker() {
-        handler2.post(new Runnable() {
+         handler2.post(new Runnable() {
             @Override
             public void run() {
 
@@ -404,7 +404,7 @@ public class MainActivity extends RobotActivity {
 
 
         //firebase
-        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        registration =  docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot snapshot,
                                 @Nullable FirebaseFirestoreException e) {
@@ -441,7 +441,7 @@ public class MainActivity extends RobotActivity {
                                     startDetectFace();
                                 }
                             }, 7000);
-                        case 4:
+                        case 10:
                             //後傾
                             score += 10;
                             robotAPI.utility.playEmotionalAction(RobotFace.HAPPY, 27);
@@ -588,16 +588,23 @@ public class MainActivity extends RobotActivity {
                     Log.d("testYifan", 1 + "");
                     if (!(TotalTime >= 80)) {
                         count_tips = 0;
-                        draw_num = lotteryNum(TotalTime, TotalTime + 15);
+                        draw_num = lotteryNum(TotalTime + 5, TotalTime + 20);
                     }
                 } else if (watchOrientation == speakScript.getWatchOrientation()) {
                     robotAPI.robot.speak(speakScript.getResponse(), new SpeakConfig().volume(100));
                     if (!(TotalTime >= 80)) {
                         count_tips = 0;
                         Log.d("testYifan", "enter");
-                        draw_num = lotteryNum(TotalTime, TotalTime + 15);
+                        draw_num = lotteryNum(TotalTime + 5, TotalTime + 20);
                     }
-                } else {
+                }  else if (watchOrientation == speakScript.getWatchOrientation() + 6) {
+                    robotAPI.robot.speak(speakScript.getResponse(), new SpeakConfig().volume(100));
+                    if (!(TotalTime >= 80)) {
+                        count_tips = 0;
+                        Log.d("testYifan", "enter");
+                        draw_num = lotteryNum(TotalTime + 5, TotalTime + 20);
+                    }
+                }else {
                     Log.d("testYifan", "fuck");
                     handlerForTips.postDelayed(this, 1000);
                 }

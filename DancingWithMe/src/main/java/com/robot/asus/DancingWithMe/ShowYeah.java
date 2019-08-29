@@ -134,22 +134,20 @@ public class ShowYeah extends RobotActivity {
         backImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*Intent intent = new Intent();
+                Intent intent = new Intent();
                 intent.setComponent(new ComponentName("com.robot.asus.MainDancing", "com.robot.asus.MainDancing.StartActivity" ));
-                startActivity(intent);*/
-
+                startActivity(intent);
                 System.exit(0);
-
             }
         });
 
-        if (Locale.getDefault().getLanguage().equals("en")) {
+        /*if (Locale.getDefault().getLanguage().equals("en")) {
             robotAPI.robot.setExpression(RobotFace.PLEASED, getResources().getString(R.string.MA_Hello), new ExpressionConfig().speed(85));
             iCurrentCommandSerial = robotAPI.robot.setExpression(RobotFace.ACTIVE, getResources().getString(R.string.MA_intro), new ExpressionConfig().speed(85));
         } else {
             robotAPI.robot.setExpression(RobotFace.PLEASED, getResources().getString(R.string.MA_Hello));
             iCurrentCommandSerial = robotAPI.robot.setExpression(RobotFace.ACTIVE, getResources().getString(R.string.MA_intro));
-        }
+        }*/
 
     }
 
