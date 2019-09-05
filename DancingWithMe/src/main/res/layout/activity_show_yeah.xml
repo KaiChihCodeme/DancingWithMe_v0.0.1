@@ -26,7 +26,7 @@
             android:id="@+id/LinearLayout2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="50dp"
+            android:layout_margin="30dp"
             android:gravity="center_vertical"
             android:orientation="vertical">
 
@@ -35,11 +35,11 @@
                 android:layout_width="991dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="15dp"
-                android:gravity="left"
+                android:gravity="start"
                 android:text="@string/touch"
                 android:textAllCaps="false"
                 android:textColor="#ffffff"
-                android:textSize="80sp" />
+                android:textSize="90sp" />
 
             <Button
                 android:id="@+id/chacha"
@@ -47,11 +47,11 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="15dp"
                 android:background="#2c3e50"
-                android:gravity="left"
+                android:gravity="start"
                 android:text="@string/cha"
                 android:textAllCaps="false"
                 android:textColor="#ecf0f1"
-                android:textSize="120sp" />
+                android:textSize="90sp" />
 
             <Button
                 android:id="@+id/samba"
@@ -59,11 +59,11 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="15dp"
                 android:background="#2c3e50"
-                android:gravity="left"
+                android:gravity="start"
                 android:text="@string/samba"
                 android:textAllCaps="false"
                 android:textColor="#ecf0f1"
-                android:textSize="120sp" />
+                android:textSize="90sp" />
 
             <Button
                 android:id="@+id/popsong"
@@ -71,11 +71,23 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="15dp"
                 android:background="#2c3e50"
-                android:gravity="left"
+                android:gravity="start"
                 android:text="@string/pop"
                 android:textAllCaps="false"
                 android:textColor="#ecf0f1"
-                android:textSize="120sp" />
+                android:textSize="90sp" />
+
+            <Button
+                android:id="@+id/Arabic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:background="#2c3e50"
+                android:gravity="start"
+                android:text="@string/arabic"
+                android:textAllCaps="false"
+                android:textColor="#ecf0f1"
+                android:textSize="90sp" />
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>

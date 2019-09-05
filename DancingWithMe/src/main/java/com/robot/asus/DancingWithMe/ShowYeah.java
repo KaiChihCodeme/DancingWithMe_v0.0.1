@@ -27,7 +27,7 @@ public class ShowYeah extends RobotActivity {
 
 
     private ImageView backImageView;
-    private Button chachaButton,popButton,sambaButton;
+    private Button chachaButton,popButton,sambaButton, arabicButton;
     private static int iCurrentCommandSerial;
 
     public static RobotCallback robotCallback = new RobotCallback() {
@@ -104,6 +104,7 @@ public class ShowYeah extends RobotActivity {
         popButton = (Button)findViewById(R.id.popsong);
         sambaButton = (Button)findViewById(R.id.samba);
         backImageView = (ImageView)findViewById(R.id.back);
+        arabicButton = (Button)findViewById(R.id.Arabic);
 
         chachaButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,6 +130,15 @@ public class ShowYeah extends RobotActivity {
             public void onClick(View view) {
                 Intent intent = new Intent();
                 intent.putExtra("songName", R.raw.paistropical);
+                intent.setClass(ShowYeah.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
+        arabicButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.putExtra("songName", R.raw.lhrby);
                 intent.setClass(ShowYeah.this, MainActivity.class);
                 startActivity(intent);
             }
